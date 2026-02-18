@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muminji Ward – Agent Access</title>
+
+<!-- Lightweight, minimal CSS -->
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    background:#f5f7fa;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    line-height:1.5;
+    padding:1rem;
+}
+.container{
+    max-width:800px;
+    margin:0 auto;
+}
+.card{
+    background:white;
+    border-radius:16px;
+    padding:1.5rem;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom:1rem;
+}
+.form-group{margin-bottom:1rem}
+label{display:block;font-weight:600;margin-bottom:0.25rem}
+input,select{
+    width:100%;
+    padding:0.6rem 0.75rem;
+    border:1px solid #ced4da;
+    border-radius:10px;
+    font-size:1rem;
+}
+.input-group{display:flex}
+.input-group input{border-radius:10px 0 0 10px}
+.input-group button{
+    padding:0.6rem 1rem;
+    border:1px solid #ced4da;
+    border-left:0;
+    background:white;
+    border-radius:0 10px 10px 0;
+    cursor:pointer;
+}
+.btn{
+    width:100%;
+    padding:0.75rem;
+    border:none;
+    border-radius:10px;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    margin:0.5rem 0;
+}
+.btn-primary{background:#0B3D2E;color:white}
+.btn-success{background:#198754;color:white}
+.btn-danger{background:#dc3545;color:white}
+.btn-warning{background:#ffc107;color:#000}
+.text-center{text-align:center}
+.mt-3{margin-top:1rem}
+.mb-3{margin-bottom:1rem}
+.small{font-size:0.875rem}
+.text-muted{color:#6c757d}
+.text-danger{color:#dc3545}
+.text-success{color:#198754}
+.d-flex{display:flex}
+.align-center{align-items:center}
+.justify-between{justify-content:space-between}
+.gap-2{gap:0.5rem}
+.ms-auto{margin-left:auto}
+
+/* Candidate cards */
+.candidate-card{
+    background:#f8f9fa;
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:12px;
+    border:1px solid #e9ecef;
+    display:flex;
+    gap:15px;
+}
+.candidate-avatar{
+    width:60px;height:60px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid #dee2e6;
+}
+.candidate-info{flex:1}
+.candidate-name{font-weight:600}
+.candidate-party{font-size:0.85rem;color:#6c757d}
+.candidate-input-group{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:5px;
+}
+.candidate-input-group input{
+    width:120px;
+    text-align:center;
+}
+
+.summary-box{
+    background:#e9f2ff;
+    padding:1rem;
+    border-radius:8px;
+}
+.alert{
+    padding:1rem;
+    border-radius:8px;
+    margin:1rem 0;
+}
+.alert-warning{background:#fff3cd;color:#856404}
+.alert-danger{background:#f8d7da;color:#721c24}
+
+/* Modal */
+.modal{
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+}
+.modal-content{
+    background:white;
+    border-radius:20px;
+    padding:2rem;
+    max-width:400px;
+    width:90%;
+    text-align:center;
+}
+.modal-header{
+    font-size:3rem;
+    margin-bottom:1rem;
+}
+.modal-header.critical{color:#dc3545}
+.modal-header.warning{color:#ffc107}
+.modal-actions{
+    display:flex;
+    gap:1rem;
+    margin-top:1.5rem;
+}
+.modal-actions button{width:auto;flex:1}
+.hidden{display:none}
+
+/* Responsive */
+@media (max-width:576px){
+    .candidate-card{flex-direction:column;text-align:center}
+    .candidate-input-group{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Registration Card -->
+  <div id="registrationCard" class="card">
+    <h4 class="text-center mb-3">📋 Agent Registration</h4>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="regFullName" placeholder="e.g., John Mwangi">
+    </div>
+    <div class="form-group">
+      <label>Polling Station</label>
+      <select id="regStationSelect">
+        <option value="" disabled selected>– select your polling station –</option>
+      </select>
+    </div>
+    <div class="form-group">
+  <label>Phone Number</label>
+  <input type="tel" id="regPhone" placeholder="e.g., 07XXXXXXXX" pattern="[0-9]{10}" maxlength="10">
+  <div class="small text-muted">Enter 10-digit phone number</div>
+</div>
+    <div class="form-group">
+      <label>Email address</label>
+      <input type="email" id="regEmail" placeholder="agent@example.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-group">
+        <input type="password" id="regPassword" placeholder="at least 6 characters">
+        <button type="button" onclick="togglePassword('regPassword', this)">👁️</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Confirm password</label>
+      <div class="input-group">
+        <input type="password" id="regConfirmPw" placeholder="re-enter password">
+        <button type="button" onclick="togglePassword('regConfirmPw', this)">👁️</button>
+      </div>
+      <div id="pwMatchFeedback" class="small text-danger"></div>
+    </div>
+    <button class="btn btn-primary" onclick="handleRegister()">📝 Register as Agent</button>
+    <div class="text-center mt-3">
+      <span class="text-muted">Already have an account?</span>
+      <a href="#" id="showLoginLink">Log in</a>
+    </div>
+    <div id="regMessage" class="text-center small mt-3"></div>
+  </div>
+
+  <!-- Login Card -->
+  <div id="loginCard" class="card hidden">
+    <h4 class="text-center mb-3">🔐 Agent Login</h4>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="agent@example.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-group">
+        <input type="password" id="loginPassword" placeholder="••••••••">
+        <button type="button" onclick="togglePassword('loginPassword', this)">👁️</button>
+      </div>
+    </div>
+    <button class="btn btn-success" onclick="handleLogin()">🔓 Log in</button>
+    <div class="text-center mt-3">
+      <span class="text-muted">Not registered?</span>
+      <a href="#" id="showRegisterLink">Create account</a>
+    </div>
+    <div id="loginMessage" class="text-center small mt-3"></div>
+  </div>
+
+  <!-- Submission Panel -->
+  <div id="submissionPanel" class="card hidden">
+    <div class="d-flex align-center justify-between mb-3">
+      <span class="fw-bold" id="greetingUser"></span>
+      <span class="text-muted">📍 <span id="assignedStationDisplay"></span></span>
+    </div>
+    <h5 class="text-center mb-3">🗳️ Submit results</h5>
+    
+    <div class="form-group">
+      <label>Polling Station</label>
+      <input type="text" id="fixedStationName" readonly>
+    </div>
+    <div class="form-group">
+      <label>Registered Voters</label>
+      <input type="number" id="registeredVoters" value="0" readonly>
+    </div>
+
+    <h6 class="mb-2">Candidates</h6>
+    <div id="candidates"></div>
+
+    <div class="form-group">
+      <label>Rejected Votes</label>
+      <input type="number" class="vote-input" id="rejected" value="0" min="0">
+    </div>
+
+    <div class="summary-box mb-3">
+      <p><strong>Total Valid Votes:</strong> <span id="validVotes">0</span></p>
+      <p><strong>Total Votes Cast:</strong> <span id="totalVotes">0</span></p>
+      <p><strong>Turnout %:</strong> <span id="turnout">0</span>%</p>
+    </div>
+
+    <div id="irregularitiesDisplay" class="hidden"></div>
+    <button class="btn btn-success" onclick="confirmSubmission()">Submit Results</button>
+    <div id="message" class="text-center small mt-3"></div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header" id="modalHeader">⚠️</div>
+    <h4 id="modalTitle">Confirm Submission</h4>
+    <p id="modalMessage">Are you sure you want to submit these results?</p>
+    <div id="modalIrregularities" class="hidden"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
+      <button class="btn btn-primary" id="confirmSubmitBtn" onclick="forceSubmitResults()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  getDoc, 
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// Firebase config
+const firebaseConfig = {
+    apiKey: "AIzaSyCJEJGa_GBufklAc7gl9-TjjBbpxao7_J8",
+    authDomain: "tallying-9df93.firebaseapp.com",
+    projectId: "tallying-9df93",
+    storageBucket: "tallying-9df93.firebasestorage.app",
+    messagingSenderId: "753383473885",
+    appId: "1:753383473885:web:233b745b693f3af1985134"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Candidates with profile photos
+const candidates = [
+    {name: "Boniface Kariuki (DEP)", party: "DEP", photo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23007bff'/%3E%3Ctext x='30' y='40' font-size='20' fill='white' text-anchor='middle' font-family='Arial'%3EBK%3C/text%3E%3C/svg%3E"},
+    {name: "John Nyaga (UPA)", party: "UPA", photo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%2328a745'/%3E%3Ctext x='30' y='40' font-size='20' fill='white' text-anchor='middle' font-family='Arial'%3EJN%3C/text%3E%3C/svg%3E"},
+    {name: "Cosmas Njeru (NEDP)", party: "NEDP", photo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23dc3545'/%3E%3Ctext x='30' y='40' font-size='20' fill='white' text-anchor='middle' font-family='Arial'%3ECN%3C/text%3E%3C/svg%3E"},
+    {name: "Joseph Ngari (UMP)", party: "UMP", photo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23ffc107'/%3E%3Ctext x='30' y='40' font-size='20' fill='black' text-anchor='middle' font-family='Arial'%3EJN%3C/text%3E%3C/svg%3E"},
+    {name: "Peterson Njeru (UDA)", party: "UDA", photo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%2317a2b8'/%3E%3Ctext x='30' y='40' font-size='20' fill='white' text-anchor='middle' font-family='Arial'%3EPN%3C/text%3E%3C/svg%3E"},
+    {name: "Charles Kiura (TWA)", party: "TWA", photo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%236c757d'/%3E%3Ctext x='30' y='40' font-size='20' fill='white' text-anchor='middle' font-family='Arial'%3ECK%3C/text%3E%3C/svg%3E"},
+    {name: "Zachary Mbogo (KMM)", party: "KMM", photo: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23343a40'/%3E%3Ctext x='30' y='40' font-size='20' fill='white' text-anchor='middle' font-family='Arial'%3EZM%3C/text%3E%3C/svg%3E"}
+];
+
+// Polling stations
+const pollingStations = [
+  {id:"MM001", name:"Kivue Primary School", voters:686},
+  {id:"MM002", name:"Mbarwari Primary School", voters:586},
+  {id:"MM003", name:"Cieria Primary School", voters:492},
+  {id:"MM004", name:"Ndutori Primary School", voters:486},
+  {id:"MM005", name:"Michegethiu Primary School", voters:471},
+  {id:"MM006", name:"Gangara Primary School A", voters:469},
+  {id:"MM007", name:"Gangara Primary School B", voters:469},
+  {id:"MM008", name:"Nguthi Primary School", voters:441},
+  {id:"MM009", name:"Kiamungongo Primary School", voters:435},
+  {id:"MM010", name:"Itiira Primary School A", voters:417},
+  {id:"MM011", name:"Itiira Primary School B", voters:416},
+  {id:"MM012", name:"Karimari Primary School", voters:404},
+  {id:"MM013", name:"Ngiirî Primary School A", voters:402},
+  {id:"MM014", name:"Ngiirî Primary School B", voters:401},
+  {id:"MM015", name:"Karambari Primary School", voters:386},
+  {id:"MM016", name:"Kirie Primary School A", voters:377},
+  {id:"MM017", name:"Kirie Primary School B", voters:377},
+  {id:"MM018", name:"Gatakari Primary School", voters:338},
+  {id:"MM019", name:"Rwagori Primary School", voters:278},
+  {id:"MM020", name:"Mukororia Primary School", voters:272},
+  {id:"MM021", name:"Kavui Primary School", voters:232},
+  {id:"MM022", name:"Kandomba Primary School", voters:229},
+  {id:"MM023", name:"Gatothia Primary School", voters:164},
+  {id:"MM024", name:"Kianjogu Primary School", voters:148},
+  {id:"MM025", name:"Kathutheri Primary School", voters:142},
+  {id:"MM026", name:"Mianjatiri Primary School", voters:131}
+];
+
+// Populate stations
+const stationSelect = document.getElementById("regStationSelect");
+pollingStations.forEach(s => {
+  const option = document.createElement("option");
+  option.value = s.id;
+  option.textContent = s.name;
+  stationSelect.appendChild(option);
+});
+
+// Render candidates
+const candidatesDiv = document.getElementById("candidates");
+candidates.forEach(c => {
+  candidatesDiv.innerHTML += `
+    <div class="candidate-card">
+      <img src="${c.photo}" alt="${c.name}" class="candidate-avatar">
+      <div class="candidate-info">
+        <div class="candidate-name">${c.name}</div>
+        <div class="candidate-party">Party: ${c.party}</div>
+        <div class="candidate-input-group">
+          <label class="small">Votes:</label>
+          <input type="number" class="vote-input candidate" min="0" value="0" data-candidate="${c.name}">
+        </div>
+      </div>
+    </div>`;
+});
+
+// Global state
+let currentUser = null;
+let pendingSubmission = null;
+let currentModal = null;
+
+// Helper functions
+window.togglePassword = (id, btn) => {
+  const input = document.getElementById(id);
+  input.type = input.type === 'password' ? 'text' : 'password';
+  btn.textContent = input.type === 'password' ? '👁️' : '🔒';
+};
+
+const showElement = (id, show) => {
+  document.getElementById(id).classList.toggle('hidden', !show);
+};
+
+const calculateTotals = () => {
+  const registered = parseInt(document.getElementById("registeredVoters").value) || 0;
+  const rejected = parseInt(document.getElementById("rejected").value) || 0;
+  
+  let valid = 0;
+  document.querySelectorAll(".candidate").forEach(input => {
+    valid += parseInt(input.value) || 0;
+  });
+  
+  const total = valid + rejected;
+  const turnout = registered ? ((total / registered) * 100).toFixed(2) : 0;
+  
+  document.getElementById("validVotes").innerText = valid;
+  document.getElementById("totalVotes").innerText = total;
+  document.getElementById("turnout").innerText = turnout;
+  
+  checkIrregularities();
+};
+
+const checkIrregularities = () => {
+  const registered = parseInt(document.getElementById("registeredVoters").value) || 0;
+  const rejected = parseInt(document.getElementById("rejected").value) || 0;
+  
+  let valid = 0;
+  const votes = {};
+  document.querySelectorAll(".candidate").forEach(input => {
+    const val = parseInt(input.value) || 0;
+    votes[input.dataset.candidate] = val;
+    valid += val;
+  });
+  
+  const totalCast = valid + rejected;
+  const turnout = registered ? (totalCast / registered) * 100 : 0;
+  const irregularities = [];
+  let statusLevel = 'normal';
+  
+  if (totalCast > registered) {
+    irregularities.push("OVER VOTING: Votes exceed registered voters.");
+    statusLevel = 'critical';
+  }
+  if (turnout > 100) {
+    irregularities.push("Turnout above 100%.");
+    statusLevel = 'critical';
+  }
+  if (turnout >= 95 && turnout <= 100 && statusLevel !== 'critical') {
+    irregularities.push("Suspicious high turnout (95%+).");
+    statusLevel = 'warning';
+  }
+  if (rejected === 0 && totalCast > 0 && statusLevel !== 'critical') {
+    irregularities.push("No rejected votes recorded.");
+    statusLevel = 'warning';
+  }
+  
+  const div = document.getElementById("irregularitiesDisplay");
+  if (irregularities.length) {
+    div.className = `alert alert-${statusLevel === 'critical' ? 'danger' : 'warning'}`;
+    div.innerHTML = `<strong>${statusLevel.toUpperCase()}:</strong><br>${irregularities.join('<br>')}`;
+    div.classList.remove('hidden');
+  } else {
+    div.classList.add('hidden');
+  }
+  
+  return {irregularities, statusLevel, totalCast, registered, votes, rejected, valid};
+};
+
+// Attach listeners
+document.querySelectorAll(".vote-input").forEach(input => {
+  input.addEventListener("input", calculateTotals);
+});
+
+// Registration
+window.handleRegister = async () => {
+  const fullName = document.getElementById("regFullName").value.trim();
+  const stationSelect = document.getElementById("regStationSelect");
+  const stationId = stationSelect.value;
+  const email = document.getElementById("regEmail").value.trim();
+  const password = document.getElementById("regPassword").value;
+  const confirmPw = document.getElementById("regConfirmPw").value;
+  const msg = document.getElementById("regMessage");
+  const phone = document.getElementById("regPhone").value.trim();
+
+// Remove spaces
+const cleanPhone = phone.replace(/\s+/g, '');
+
+// Basic validation
+if (!/^0\d{9}$/.test(cleanPhone)) {
+  msg.innerHTML = "<span class='text-danger'>Enter a valid 10-digit phone number (07XXXXXXXX).</span>";
+  return;
+}
+  
+  if (!fullName || !stationId || !email || !phone || !password || !confirmPw) {
+    msg.innerHTML = "<span class='text-danger'>All fields required.</span>";
+    return;
+  }
+  if (password !== confirmPw) {
+    document.getElementById("pwMatchFeedback").innerHTML = "Passwords do not match!";
+    return;
+  }
+  if (password.length < 6) {
+    msg.innerHTML = "<span class='text-danger'>Password must be at least 6 characters.</span>";
+    return;
+  }
+  
+  try {
+    const station = pollingStations.find(s => s.id === stationId);
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);await setDoc(doc(db, "agents", userCred.user.uid), {
+  fullName,
+  email: email.toLowerCase(),
+  phone: cleanPhone,   // ✅ Save cleaned phone
+  stationId,
+  stationName: station.name,
+  createdAt: serverTimestamp()
+});
+    
+    msg.innerHTML = "<span class='text-success'>Registration successful!</span>";
+    document.getElementById("regFullName").value = "";
+    document.getElementById("regEmail").value = "";
+    document.getElementById("regPassword").value = "";
+    document.getElementById("regConfirmPw").value = "";
+    stationSelect.selectedIndex = 0;
+  } catch (error) {
+    msg.innerHTML = `<span class='text-danger'>${error.message}</span>`;
+  }
+};
+
+// Login
+window.handleLogin = async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const msg = document.getElementById("loginMessage");
+  
+  if (!email || !password) {
+    msg.innerHTML = "<span class='text-danger'>Enter email and password.</span>";
+    return;
+  }
+  
+  try {
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+    const agentDoc = await getDoc(doc(db, "agents", userCred.user.uid));
+    if (!agentDoc.exists()) throw new Error("Agent record not found");
+    
+    const agentData = agentDoc.data();
+    const station = pollingStations.find(s => s.id === agentData.stationId);
+    if (!station) throw new Error("Station not found");
+    
+    currentUser = agentData;
+    
+    document.getElementById("greetingUser").innerText = `👤 ${agentData.fullName}`;
+    document.getElementById("assignedStationDisplay").innerText = station.name;
+    document.getElementById("fixedStationName").value = station.name;
+    document.getElementById("registeredVoters").value = station.voters;
+    
+    showElement("registrationCard", false);
+    showElement("loginCard", false);
+    showElement("submissionPanel", true);
+    
+    calculateTotals();
+  } catch (error) {
+    msg.innerHTML = `<span class='text-danger'>${error.message}</span>`;
+  }
+};
+
+// Modal functions
+window.hideModal = () => {
+  document.getElementById("confirmModal").classList.add("hidden");
+};
+
+window.confirmSubmission = async () => {
+  const stationId = pollingStations.find(s => s.name === document.getElementById("fixedStationName").value)?.id;
+  if (!stationId) return;
+  
+  const existing = await getDoc(doc(db, "results", stationId));
+  if (existing.exists()) {
+    document.getElementById("message").innerHTML = "<span class='text-danger'>Results already submitted!</span>";
+    return;
+  }
+  
+  const registered = parseInt(document.getElementById("registeredVoters").value);
+  const rejected = parseInt(document.getElementById("rejected").value) || 0;
+  const votes = {};
+  let validTotal = 0;
+  
+  document.querySelectorAll(".candidate").forEach(input => {
+    const val = parseInt(input.value) || 0;
+    votes[input.dataset.candidate] = val;
+    validTotal += val;
+  });
+  
+  const {irregularities, statusLevel} = checkIrregularities();
+  
+  pendingSubmission = {
+    stationId,
+    stationName: document.getElementById("fixedStationName").value,
+    registered, votes, rejected, validTotal,
+    totalCast: validTotal + rejected,
+    irregularities, statusLevel
+  };
+  
+  const modal = document.getElementById("confirmModal");
+  const header = document.getElementById("modalHeader");
+  const title = document.getElementById("modalTitle");
+  const msg = document.getElementById("modalMessage");
+  const irrDiv = document.getElementById("modalIrregularities");
+  const btn = document.getElementById("confirmSubmitBtn");
+  
+  if (irregularities.length) {
+    header.className = `modal-header ${statusLevel}`;
+    header.innerHTML = statusLevel === 'critical' ? '🚨' : '⚠️';
+    title.innerText = statusLevel === 'critical' ? 'Critical Issues!' : 'Warning';
+    msg.innerText = 'Submit despite irregularities?';
+    irrDiv.innerHTML = irregularities.join('<br>');
+    irrDiv.classList.remove('hidden');
+    btn.className = statusLevel === 'critical' ? 'btn btn-danger' : 'btn btn-warning';
+    btn.innerText = 'Submit Anyway';
+  } else {
+    header.innerHTML = '✅';
+    title.innerText = 'Confirm';
+    msg.innerText = 'Submit these results?';
+    irrDiv.classList.add('hidden');
+    btn.className = 'btn btn-primary';
+    btn.innerText = 'Submit';
+  }
+  
+  modal.classList.remove('hidden');
+};
+
+window.forceSubmitResults = async () => {
+  if (!pendingSubmission) return;
+  
+  try {
+    await setDoc(doc(db, "results", pendingSubmission.stationId), {
+      ...pendingSubmission,
+      submittedAt: serverTimestamp(),
+      submittedBy: auth.currentUser?.uid || "unknown"
+    });
+    
+    hideModal();
+    
+    const msg = document.getElementById("message");
+    if (pendingSubmission.irregularities.length) {
+      msg.innerHTML = `<div class="alert alert-warning">Submitted with irregularities</div>`;
+    } else {
+      msg.innerHTML = "<span class='text-success'>Submitted successfully!</span>";
+    }
+    
+    document.querySelectorAll("input").forEach(i => i.disabled = true);
+    document.querySelector("button[onclick='confirmSubmission()']").disabled = true;
+  } catch (error) {
+    document.getElementById("message").innerHTML = `<span class='text-danger'>${error.message}</span>`;
+  }
+};
+
+// UI Toggle
+document.getElementById("showLoginLink").addEventListener("click", (e) => {
+  e.preventDefault();
+  showElement("registrationCard", false);
+  showElement("loginCard", true);
+});
+
+document.getElementById("showRegisterLink").addEventListener("click", (e) => {
+  e.preventDefault();
+  showElement("loginCard", false);
+  showElement("registrationCard", true);
+});
+
+// Password match check
+document.getElementById("regConfirmPw").addEventListener("input", function() {
+  const pw = document.getElementById("regPassword").value;
+  const feedback = document.getElementById("pwMatchFeedback");
+  feedback.innerHTML = this.value && pw !== this.value ? "Passwords do not match!" : "";
+});
+
+// Auth state
+onAuthStateChanged(auth, (user) => {
+  console.log("Auth state:", user?.email);
+});
+
+// Hide modal on outside click
+document.getElementById("confirmModal").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) hideModal();
+});
+</script>
+</body>
+</html>
